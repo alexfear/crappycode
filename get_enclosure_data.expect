@@ -1,0 +1,19 @@
+#!/usr/bin/expect
+## This script gathers info about msa2324i enclosure with help of ssh and EXPECT interactive tool
+set timeout 50
+set hostName hostname
+set userName user
+set password password
+
+log_user 0
+spawn ssh $userName@$hostName
+
+expect "Password:" { send "$password\r" }
+log_user 1
+expect "#" { send "set cli-parameters Pager off\r" }
+expect "#" { send "set cli-parameters api\r" }
+expect "#" { send "set cli-parameters brief on\r" }
+expect "#" { send "show enclosures\r" }
+expect "#" { send "exit\r" }
+expect eof
+exit 0
