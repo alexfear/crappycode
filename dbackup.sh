@@ -15,7 +15,7 @@ DATE=`date +%F`
 
 /usr/bin/mysqldump -u$MUSER -p$MPASSWORD --single-transaction $DBNAME | gzip -5 > $BDIR/$DBNAME_$DATE.sql.gz
 /usr/bin/find $BDIR/ -type f -mtime +$NBTK -exec rm -f {} \;
-lftp -u $FTPUSER,$FTPPASSWORD $FTPSERVER << EOF #transferring the backup to ftp
+lftp -u $FTPUSER,$FTPPASSWORD $FTPSERVER << EOF
 	mirror -Re --delete --use-cache --only-newer $BDIR /backup
 	quit 0
 EOF

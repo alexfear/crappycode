@@ -1,4 +1,5 @@
 #/bin/bash
+#Author: Alex Antonov
 #The program extracts every regular zip archive from the source directory,
 #packs the data to a new password-encrypted RAR archive and then packs the archive again to a regular ZIP archive
 
