@@ -19,7 +19,7 @@ for FILE in $(ls $SOURCE); do
         [[ "$FILE" == *.zip ]] || continue
         FILERAR=`echo $FILE | sed -e 's/\.zip/\.rar/g'`
         /usr/bin/nice -n 5 /usr/bin/unzip -q $SOURCE/$FILE -d $TEMP >/dev/null 2>&1 || {
-                echo "$SOURE/$FILE has issues with extraction. Skipping..." >>/var/log/ziprepack.log
+                echo "$SOURCE/$FILE has issues with extraction. Skipping..." >>/var/log/ziprepack.log
                 clear_temp
                 continue
         }
