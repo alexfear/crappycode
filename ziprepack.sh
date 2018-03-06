@@ -32,4 +32,4 @@ for FILE in $(ls $SOURCE); do
         clear_temp
         ((++COUNTER))
 done
-/bin/echo "Number of processed files: $COUNTER--------------------------------------------" | tee -a /var/log/ziprepack.log
+/bin/echo `date +%F" "%T`" Number of processed files: $COUNTER--------------------------------------------" | tee -a /var/log/ziprepack.log
