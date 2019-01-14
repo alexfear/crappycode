@@ -1,4 +1,5 @@
 #!/bin/bash
+## Author: Alex Antonov
 ## The program backs up all databases of a mysql server 
 ## Excluding ones from the exclusion list and 
 ## Truncating tables which names start with "cache".
