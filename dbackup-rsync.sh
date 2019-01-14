@@ -25,7 +25,7 @@ backup(){
 	done
         /usr/bin/mysqldump -u$MUSER -h$MHOST -p$MPASS --single-transaction $db | /bin/gzip -9 > $BACKUPDIR/"$db"_"$DATESTAMP".sql.gz
     done
-    /usr/bin/rsync -aqz --rsh="ssh -p33322" --delete $BACKUPDIR rsync@"$BACKUPHOST":/usr/local/backup/sitepack1/
+    /usr/bin/rsync -aqz --rsh="ssh -p22" --delete $BACKUPDIR rsync@"$BACKUPHOST":/usr/local/backup/sitepack1/
     logger " DBs are backed up"
 }
 
