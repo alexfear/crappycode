@@ -43,8 +43,8 @@ int isPrime(long unsigned orig){
   int unsigned w=2;
   while(i*i<=orig) {
     if(orig%i==0) return 0;
-      i+=w;
-      w=6-w;
-    }
+    i+=w;
+    w=6-w;
+  }
   return 1;
 }
