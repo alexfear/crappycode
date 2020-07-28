@@ -27,15 +27,15 @@ vapp_deployed() {
 
 undeploy_vapp() {
   UNDEPLOY_TASK=$($CURL -s -i -k -H "Accept:application/*+xml;version=$API_VERSION" -H "x-vcloud-authorization:$TOKEN" -H "Content-Type:application/vnd.vmware.vcloud.undeployVAppParams+xml" -X POST -d '<UndeployVAppParams xmlns="http://www.vmware.com/vcloud/v1.5"><UndeployPowerAction>powerOff</UndeployPowerAction></UndeployVAppParams>' "$1/action/undeploy" | grep -i "<Task" | egrep -o "href=\"[a-zA-Z0-9!_+-:,;=/]+\"" | cut -d'"' -f2)
-  if [ $UNDEPLOY_TASK ]; then
-    task_progress $UNDEPLOY_TASK "Undeploying $VAPP... "
+  if [ "$UNDEPLOY_TASK" ]; then
+    task_progress $UNDEPLOY_TASK "Undeploying $1... "
   fi
 }
 
-delete_vapp() {
-  DELETE_TASK=$($CURL -s -i -k -H "Accept:application/*+xml;version=$API_VERSION" -H "x-vcloud-authorization:$TOKEN" -X DELETE "$VAPP" | grep -i "<Task" | egrep -o "href=\"[a-zA-Z0-9!_+-:,;=/]+\"" | cut -d'"' -f2)
-  if [ $DELETE_TASK ]; then
-    task_progress $DELETE_TASK "Deleting $VAPP... "
+delete_entity() {
+  DELETE_TASK=$($CURL -s -i -k -H "Accept:application/*+xml;version=$API_VERSION" -H "x-vcloud-authorization:$TOKEN" -X DELETE "$1" | grep -i "<Task" | egrep -o "href=\"[a-zA-Z0-9!_+-:,;=/]+\"" | cut -d'"' -f2)
+  if [ "$DELETE_TASK" ]; then
+    task_progress $DELETE_TASK "Deleting $1... "
   fi
 }
 
@@ -90,7 +90,7 @@ echo "Using API version $API_VERSION"
 # Getting a session token
 printf "Logging in... "
 TOKEN=$($CURL -s -i -k -H "Accept:application/*+xml;version=$API_VERSION" -u $VCD_USER@system:$VCD_PASSWORD -X POST https://$VCD_HOST/api/sessions | egrep -o "x-vcloud-authorization\:\ [a-z0-9]+" | cut -d' ' -f2)
-if [ $TOKEN ]; then
+if [ "$TOKEN" ]; then
   echo "OK"
 else 
   echo "Error: unahthorized, check the credentials" && exit 1; 
@@ -103,7 +103,7 @@ VAPPS_TO_KEEP=$($CURL -s -i -k -H "Accept:application/*+xml;version=$API_VERSION
 
 # Building a filter to prevent the vApps from being deleted
 FILTER=''
-if [ $VAPPS_TO_KEEP ]; then
+if [ "$VAPPS_TO_KEEP" ]; then
   for VAPP_TO_KEEP in $VAPPS_TO_KEEP; do
     FILTER+="name!=$VAPP_TO_KEEP;"
   done
@@ -120,7 +120,7 @@ VAPP_TEMPLATES_TO_KEEP=$($CURL -s -i -k -H "Accept:application/*+xml;version=$AP
 
 # Building a filter to prevent the vApp Templates from being deleted
 FILTER=''
-if [ $VAPP_TEMPLATES_TO_KEEP ]; then
+if [ "$VAPP_TEMPLATES_TO_KEEP" ]; then
   for VAPP_TEMPLATE_TO_KEEP in $VAPP_TEMPLATES_TO_KEEP; do
     FILTER+="name!=$VAPP_TEMPLATE_TO_KEEP;"
   done
@@ -137,7 +137,7 @@ MEDIAS_TO_KEEP=$($CURL -s -i -k -H "Accept:application/*+xml;version=$API_VERSIO
 
 # Building a filter to prevent the Medias from being deleted
 FILTER=''
-if [ $MEDIAS_TO_KEEP ]; then
+if [ "$MEDIAS_TO_KEEP" ]; then
   for MEDIA_TO_KEEP in $MEDIAS_TO_KEEP; do
     FILTER+="name!=$MEDIA_TO_KEEP;"
   done
@@ -163,11 +163,27 @@ done
 echo
 
 # Removing vApps
-for VAPP in $VAPPS_TO_REMOVE; do
-  if [ "$(vapp_deployed $VAPP)" == "true" ]; then
-    undeploy_vapp $VAPP
-  fi
-  delete_vapp $VAPP
-done
+if [ "$VAPPS_TO_REMOVE" ]; then
+  for VAPP in $VAPPS_TO_REMOVE; do
+    if [ "$(vapp_deployed $VAPP)" == "true" ]; then
+      undeploy_vapp $VAPP
+    fi
+    delete_entity $VAPP
+  done
+fi
+
+# Removing vApp Templates
+if [ "$VAPP_TEMPLATES_TO_REMOVE" ]; then 
+  for VAPP_TEMPLATE in $VAPP_TEMPLATES_TO_REMOVE; do
+    delete_entity $VAPP_TEMPLATE
+  done
+fi
+
+# Removing Media (ISOs)
+if [ "$MEDIAS_TO_REMOVE" ]; then 
+  for MEDIA in $MEDIAS_TO_REMOVE; do
+    delete_entity $MEDIA
+  done
+fi
 
 logout $VCD_HOST $TOKEN $API_VERSION
