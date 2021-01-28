@@ -4,18 +4,18 @@ import pika
 credentials = pika.PlainCredentials('', '')
 
 connection = pika.BlockingConnection(
-        pika.ConnectionParameters('localhost',
+        pika.ConnectionParameters('host',
                                    5672,
                                    '/',
                                    credentials))
 channel = connection.channel()
 
-channel.exchange_declare(exchange='', exchange_type='fanout')
+channel.exchange_declare(exchange='', exchange_type='topic', durable=True)
 
 result = channel.queue_declare(queue='', exclusive=True)
 queue_name = result.method.queue
 
-channel.queue_bind(exchange='', queue=queue_name)
+channel.queue_bind(exchange='', queue=queue_name, routing_key='true.#')
 
 print(' [*] Waiting for logs. To exit press CTRL+C')
 
