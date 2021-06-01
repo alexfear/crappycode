@@ -1,0 +1,1 @@
+Get-VMHost $args[0] | Get-VM | ForEach-Object {$path = ''; $folder = $_.Folder; do {$path = "$folder\$path"; $folder = $folder.parent;} until (($folder -eq $null) -or ($folder.name -eq "vm")); Write-Host $_.name"`t"$path}
