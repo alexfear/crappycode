@@ -1,1 +1,0 @@
-for i in `ls $1` ; do if [[ `ls $1/$i | wc -l` = 0 ]]; then echo "$1/$i" ; fi ; done
